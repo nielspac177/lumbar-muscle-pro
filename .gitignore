@@ -1,0 +1,36 @@
+# ============================================================
+# DATA & PHI — NEVER COMMIT. This repo is code-only.
+# ============================================================
+*.xlsx
+*.xls
+*.csv
+*.tsv
+*.parquet
+*.dta
+*.sav
+*.dcm
+data/
+Base_segments_lumbar/
+**/Final*Lumbar*
+config.yaml          # real config (contains absolute data path) — use config.example.yaml as template
+
+# Analysis outputs (regenerable)
+figures/*
+!figures/.gitkeep
+results/*
+!results/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+*.egg-info/
+.pytest_cache/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

@@ -1,0 +1,19 @@
+# Copy this file to config.yaml (which is gitignored) and set the absolute path
+# to the dataset on your machine. The data file is NEVER stored in the repo.
+
+# Absolute path to the source Excel workbook (lives outside the repo)
+DATA_PATH: "/Users/<you>/Desktop/Research/Jimena Gonzales-salidos/Base_segments_lumbar/Final Together Lumbar decompresion (1).xlsx"
+SHEET: "Complete"
+
+# Header parsing: row 0 = structure group, row 1 = metric, data starts row 2
+HEADER_GROUP_ROW: 0
+HEADER_METRIC_ROW: 1
+DATA_START_ROW: 2
+
+# Analysis choices (see PLAN.md)
+VOLUME_METRIC: "Volume ( LM) cm3"   # which of the two volume methods to use
+QUALITY_METRIC: "mean"              # intensity mean = muscle-quality proxy
+WINSOR_LIMITS: [0.0, 0.01]          # cap top 1% volume outliers
+PRIMARY_OUTCOME: "PROMIS Physical Function"
+PRIMARY_TIMEPOINTS: ["6W Post", "1Y Post"]
+PROMIS_PF_MCID: 4.5                 # points; sensitivity-test 3.0–8.0 (see PLAN.md)
