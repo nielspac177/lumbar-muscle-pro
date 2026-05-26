@@ -12,7 +12,8 @@
 data/
 Base_segments_lumbar/
 **/Final*Lumbar*
-config.yaml          # real config (contains absolute data path) — use config.example.yaml as template
+# real config (contains absolute data path) — use config.example.yaml as template
+config.yaml
 
 # Analysis outputs (regenerable)
 figures/*

@@ -1,31 +1,126 @@
-"""Models for H1-H4 (see PLAN.md §1, §5). Effects reported per 1 SD of exposure.
+"""Statistical models for the muscle-outcome study (PLAN.md §1, §5).
 
-PLANNING SKELETON — interfaces only; not yet implemented.
+Primary analysis is ANCOVA: the one-year outcome regressed on a standardised
+muscle exposure plus the baseline outcome, age, and sex, with HC3 robust standard
+errors; effects are reported per one standard deviation of the exposure. A linear
+mixed model over all timepoints provides an efficient, missingness-tolerant
+companion analysis, and logistic regression models attainment of the MCID.
 """
 from __future__ import annotations
+import numpy as np
 import pandas as pd
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
 
-COVARIATES = ["age", "sex", "bmi", "num_level"]  # + baseline outcome added per-model
+# Exposures of interest: spine-normalised volume and quality for each muscle,
+# plus the composite volume score. Names match the z_ columns from cleaning.py.
+EXPOSURES = [
+    "z_iliopsoas_voln", "z_deep_back_voln", "z_glut_med_voln", "z_composite_voln",
+    "z_iliopsoas_qual", "z_deep_back_qual", "z_glut_med_qual",
+]
+ADJUST = ["pf_base", "age", "C(sex)"]   # baseline replaced per-outcome in ancova()
 
 
-def linear_change_model(df, exposure, delta_outcome, baseline_outcome):
-    """H1/H2/H4: OLS Δoutcome ~ exposure + covariates + baseline, HC3 robust SE.
-    Returns beta (per SD), 95% CI, p."""
-    raise NotImplementedError
+def ancova(df, exposure, outcome="pf", timepoint="1y", covars=("age", "C(sex)")):
+    """Fit `outcome_tp ~ exposure + outcome_base + covars` with HC3 SE.
+
+    Returns a dict with the per-SD coefficient, 95% CI, p-value, and n.
+    """
+    y = f"{outcome}_{timepoint}"
+    base = f"{outcome}_base"
+    rhs = " + ".join([exposure, base, *covars])
+    d = df.dropna(subset=[y, base, exposure, "age", "sex"]).copy()
+    model = smf.ols(f"{y} ~ {rhs}", data=d).fit(cov_type="HC3")
+    ci = model.conf_int().loc[exposure]
+    return {
+        "exposure": exposure, "outcome": outcome, "timepoint": timepoint,
+        "n": int(model.nobs), "beta": float(model.params[exposure]),
+        "ci_low": float(ci[0]), "ci_high": float(ci[1]),
+        "p": float(model.pvalues[exposure]),
+    }
 
 
-def mcid_logistic(df, exposure, mcid_flag):
-    """H3: logistic MCID-achieved ~ exposure + covariates. Returns OR, 95% CI, p."""
-    raise NotImplementedError
+# Exposures contrasted in the MCID figure: size (volume) vs quality (texture),
+# for each muscle, plus the crude mean-intensity quality for reference.
+MCID_EXPOSURES = [
+    "z_iliopsoas_voln", "z_deep_back_voln", "z_glut_med_voln",
+    "z_iliopsoas_texture", "z_deep_back_texture", "z_glut_med_texture",
+]
+
+
+def mcid_table(df: pd.DataFrame) -> pd.DataFrame:
+    """Odds ratios for achieving MCID on ODI and PROMIS-PF at 1 year, per exposure.
+
+    The headline contrast is muscle size (volume) versus muscle quality (texture).
+    """
+    rows = []
+    specs = [("ODI MCID (≥12.8)", "odi_mcid_1y", "odi_base"),
+             ("PROMIS-PF MCID (≥4.5)", "pf_mcid_1y", "pf_base")]
+    for model, flag, base in specs:
+        for exp in MCID_EXPOSURES:
+            try:
+                r = mcid_logistic(df, exp, flag=flag, covars=("age", "C(sex)", base))
+                r["model"] = model
+                rows.append(r)
+            except Exception:
+                pass
+    return pd.DataFrame(rows)
+
+
+def mcid_logistic(df, exposure, flag="pf_mcid_1y", covars=("age", "C(sex)", "pf_base")):
+    """Logistic regression of MCID attainment on a standardised exposure."""
+    rhs = " + ".join([exposure, *covars])
+    d = df.dropna(subset=[flag, exposure, "age", "sex", "pf_base"]).copy()
+    model = smf.logit(f"{flag} ~ {rhs}", data=d).fit(disp=0)
+    ci = model.conf_int().loc[exposure]
+    return {
+        "exposure": exposure, "n": int(model.nobs),
+        "or": float(np.exp(model.params[exposure])),
+        "ci_low": float(np.exp(ci[0])), "ci_high": float(np.exp(ci[1])),
+        "p": float(model.pvalues[exposure]),
+    }
+
+
+def mmrm(df, exposure, outcome="pf"):
+    """Linear mixed model over all timepoints: efficient under MAR (PLAN.md §5).
+
+    Long-format outcome with a categorical time factor, a random intercept per
+    patient, and an exposure x time interaction. Returns the model summary frame.
+    """
+    tps = ["base", "6w", "3m", "6m", "1y", "2y"]
+    long = df.melt(id_vars=["mrn", exposure, "age", "sex"],
+                   value_vars=[f"{outcome}_{t}" for t in tps],
+                   var_name="time", value_name="score")
+    long["time"] = long["time"].str.replace(f"{outcome}_", "", regex=False)
+    long = long.dropna(subset=["score", exposure, "mrn"])
+    long["time"] = pd.Categorical(long["time"], categories=tps, ordered=True)
+    md = smf.mixedlm(f"score ~ {exposure} * C(time) + age + C(sex)",
+                     long, groups=long["mrn"])
+    return md.fit(method="lbfgs", maxiter=200)
 
 
 def run_all(cohort: pd.DataFrame) -> pd.DataFrame:
-    """Run H1-H4 across the three muscles × (volume, quality), assemble a tidy
-    results table (estimate, CI, p, model) for the forest plot and abstract."""
-    raise NotImplementedError
+    """ANCOVA for every exposure on PROMIS-PF at 1Y plus the leg-pain negative
+    control, assembled into one tidy results table for the JAMA forest figure."""
+    rows = []
+    for exp in EXPOSURES:
+        rows.append({"model": "PF 1Y (ANCOVA)", **ancova(cohort, exp, "pf", "1y")})
+    for exp in EXPOSURES:
+        r = ancova(cohort, exp, "leg", "1y")
+        r["model"] = "Leg pain 1Y (neg. control)"
+        rows.append(r)
+    return pd.DataFrame(rows)
 
 
-def sensitivity(cohort: pd.DataFrame) -> dict:
-    """MCID-threshold sweep, raw vs spine-normalized exposure, complete-case vs
-    multiple imputation, with/without outlier exclusion."""
-    raise NotImplementedError
+def quality_direction(cohort: pd.DataFrame) -> pd.DataFrame:
+    """Empirically resolve the sign of 'quality': correlate each muscle's raw
+    intensity with age and with volume (older / atrophied -> more fat)."""
+    rows = []
+    for m in ("iliopsoas", "deep_back", "glut_med"):
+        q = cohort[f"{m}_qual"]
+        rows.append({
+            "muscle": m,
+            "corr_quality_age": cohort[["age"]].assign(q=q).corr().loc["age", "q"],
+            "corr_quality_volume": cohort[[f"{m}_vol"]].assign(q=q).corr().iloc[0, 1],
+        })
+    return pd.DataFrame(rows)

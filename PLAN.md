@@ -98,11 +98,17 @@ flowchart TD
 - **Primary:** PROMIS Physical Function (T-score).
 - **Secondary:** ODI; Back-pain NRS; PROMIS Pain Interference.
 - **Negative control:** Leg-pain NRS.
-- Modeled as **change from baseline** and as **MCID achieved** (binary).
+- Modeled by **ANCOVA** (1Y score adjusted for baseline — preferred over change
+  scores) and as **MCID achieved** (binary).
 
 ### Covariates (a priori, from DAG)
-Age, sex, BMI, number of levels, baseline value of the outcome.
-Sensitivity: + ASA, diabetes, diagnosis, surgical approach.
+Primary model: **age, sex, and baseline value of the outcome** (all near-complete in the
+analytic cohort). **BMI and number of levels are excluded from the primary model**:
+weight/height are corrupted (mixed g/kg and cm/m/mm units, extreme outliers), and
+`num_level` is recorded for only ~37 of the segmentation∩1Y-PF patients, so forcing
+either in collapses N from ~124 to ~37. The spine-normalized exposure already adjusts
+for body size. Both enter sensitivity models (in the subset, or after imputation) only;
+further sensitivity: + ASA, diabetes, diagnosis, approach.
 
 ---
 
@@ -110,26 +116,41 @@ Sensitivity: + ASA, diabetes, diagnosis, surgical approach.
 
 ```mermaid
 flowchart TD
-    L[Load Excel<br/>2-row header] --> C[Clean: winsorize volume,<br/>derive age/BMI/indices]
-    C --> T[Tidy analytic frame<br/>z-score exposures]
-    T --> T1[Table 1<br/>cohort description]
-    T --> M1[H1/H2: OLS ΔPF ~ muscle<br/>+ age+sex+BMI+levels+baseline]
-    T --> M2[H3: Logistic MCID ~ muscle + covars]
-    T --> M3[H4: OLS Δleg-pain ~ muscle + covars]
-    M1 --> S[Sensitivity:<br/>complete-case vs imputation,<br/>MCID threshold sweep,<br/>raw vs spine-normalized]
+    L[Load Excel<br/>2-row header] --> C[Clean: drop implausible volumes,<br/>derive age, spine-normalized index]
+    C --> Q[Resolve quality direction<br/>intensity vs age & volume]
+    Q --> T[Tidy frame<br/>z-score exposures]
+    T --> T1[Table 1 + completers vs<br/>non-completers comparison]
+    T --> M0[PRIMARY: ANCOVA PF@1Y ~ muscle<br/>+ baseline+age+sex+levels, HC3]
+    T --> M1[MMRM: PF ~ muscle*time<br/>all timepoints, MAR efficient]
+    T --> M2[Logistic MCID@1Y ~ muscle + covars]
+    T --> M3[NEG CONTROL: ANCOVA leg-pain@1Y ~ muscle]
+    M0 --> S[Sensitivity:<br/>MI vs complete-case, MCID sweep,<br/>raw vs spine-norm, +BMI/ASA]
+    M1 --> S
     M2 --> S
     M3 --> S
-    S --> F[Forest plot + trajectory plot]
+    S --> F[JAMA table+forest · trajectory plot]
     F --> AB[CNS abstract draft]
 ```
 
-- **Models:** multivariable OLS (continuous Δ outcomes) with robust (HC3) SE;
-  logistic regression (MCID). Effects per 1 SD of exposure with 95% CI.
-- **Primary estimand:** adjusted association of each muscle exposure with ΔPROMIS-PF@1Y.
-- **Multiplicity:** primary = iliopsoas × PF@1Y. Others are secondary/exploratory;
-  report CIs, flag as hypothesis-generating (note for abstract honesty).
-- **Missing data:** primary = complete-case; sensitivity = multiple imputation.
-- **MCID:** PROMIS-PF ≈ 4.5 (sweep 3.0–8.0); ODI ≈ 12.8-point / 30% change.
+- **Primary model:** **ANCOVA** — PROMIS-PF at 1Y regressed on the muscle exposure +
+  baseline PF + age + sex + number of levels; HC3 robust SE; effect per 1 SD with 95% CI.
+- **Efficiency/robustness:** **linear mixed model (MMRM)** over all timepoints
+  (random intercept per patient; muscle × time interaction), using maximum likelihood to
+  retain all patients with ≥1 follow-up under MAR — addresses the ~50% 1Y attrition and
+  yields the recovery-trajectory figure.
+- **MCID:** logistic regression for attainment at 1Y; PROMIS-PF threshold ≈ 4.5 (sweep
+  3.0–8.0); ODI ≈ 12.8-point / 30% change.
+- **Negative control (H4):** identical ANCOVA on leg-pain NRS; a non-null effect here
+  would signal residual (frailty) confounding rather than a specific functional pathway.
+- **Exposures:** per-muscle spine-normalized volume and relative quality (z-scored);
+  **prespecified primary = iliopsoas volume**; a composite paraspinal z-score
+  (mean of the three muscles) as a power-boosting secondary. Other muscle/outcome/
+  timepoint combinations are exploratory, reported with CIs, not p-thresholded.
+- **Quality direction** is resolved empirically (intensity vs age and vs volume) before
+  interpretation, then labelled "relative attenuation/quality" given non-Hounsfield units.
+- **Missing data:** MMRM (MAR) is primary for efficiency; complete-case ANCOVA as the
+  interpretable headline; multiple imputation as sensitivity; completers vs
+  non-completers compared on baseline characteristics.
 - **Software:** Python (pandas, statsmodels). Fully scripted & reproducible.
 
 ---

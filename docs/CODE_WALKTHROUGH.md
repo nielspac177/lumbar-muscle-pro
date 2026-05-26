@@ -99,23 +99,31 @@ matching column, or `None` if nothing matches, which keeps downstream code conci
 
 # Module 2 — `cleaning.py`
 
-This module turns raw columns into the variables the models need and addresses the two
-data-quality issues identified during inspection (volume outliers and ambiguous
-intensity units). It currently specifies the interface; the bodies are implemented at
-the analysis stage.
+This module turns raw columns into the variables the models need and addresses the
+data-quality issues identified during inspection. `compute_age` derives age from the
+raw datetime components (tolerating corrupted dates that overflow pandas) and restricts
+to 18–100 years; `normalize_sex` harmonises the mixed male/female/m/f coding;
+`drop_implausible` sets non-positive values and extreme upper outliers (beyond the third
+quartile plus three interquartile ranges) to missing, which removes segmentation errors
+such as the 170,583 cm³ iliopsoas "volume" without distorting the real distribution.
 
-- `derive_demographics` computes age as the interval between date of surgery and date of
-  birth, and body-mass index as weight divided by height in metres squared.
-- `winsorize_volumes` caps physiologically implausible muscle volumes. Inspection found
-  an iliopsoas maximum of 170,583 cm³ against a median near 88 cm³, indicating
-  segmentation or data-entry errors; capping the upper tail prevents a handful of
-  artefacts from dominating the regression.
-- `build_muscle_exposures` sums left and right sides for each muscle, forms the
-  spine-normalised volume index (muscle volume divided by vertebral-body volume), and
-  standardises each exposure so that effects are interpretable per standard deviation.
-- `build_outcomes` extracts the baseline, six-week, and one-year values of each outcome,
-  computes change scores, and flags attainment of the minimal clinically important
-  difference.
+`build_muscle_exposures` is the heart of the module. For each muscle it combines the
+left and right sides (volume summed; intensity statistics averaged) and constructs two
+families of exposure. **Size:** total volume and a spine-normalised volume index (muscle
+volume divided by vertebral-body volume, which removes body-size effects without relying
+on the corrupted height and weight fields). **Quality:** because absolute MRI signal is
+not comparable across scanners, we prefer scanner-robust measures of *fatty infiltration*
+based on intramuscular signal heterogeneity—the coefficient of variation (SD divided by
+mean) and the normalised interpercentile spread ((p95−p5)/median)—since fatty streaking
+increases the variance of the muscle signal. These two correlate ~0.9 and are combined
+into a single `texture` score per muscle. A reference-normalised mean intensity (muscle
+mean divided by spinal-cord mean) and the raw mean are retained for comparison. Every
+exposure is z-scored so that estimates are interpretable per standard deviation.
+
+`build_outcomes` extracts baseline through two-year values of each instrument, and
+`make_tidy` assembles the per-patient frame and flags attainment of the minimal
+clinically important difference on PROMIS-PF (>=4.5) and ODI (>=12.8), coding the flag as
+missing—never zero—when either timepoint is absent.
 
 # Module 3 — `cohort.py`
 
@@ -127,23 +135,37 @@ exclusions.
 
 # Module 4 — `analysis.py`
 
-This module contains the statistical models. `linear_change_model` fits a multivariable
-linear regression of an outcome change score on a muscle exposure, adjusting for age,
-sex, body-mass index, number of operated levels, and the baseline outcome value, with
-robust standard errors; it returns the per-standard-deviation coefficient, its
-confidence interval, and the p-value. `mcid_logistic` fits the corresponding logistic
-regression for attainment of the minimal clinically important difference. `run_all`
-applies these models across the three muscles and both exposure types and assembles a
-tidy results table, and `sensitivity` repeats the primary analysis under the alternative
-specifications named in the analysis plan.
+This module contains the statistical models. `ancova` fits the primary continuous
+analysis—the one-year outcome regressed on a muscle exposure plus the baseline outcome,
+age, and sex, with HC3 robust standard errors—returning the per-standard-deviation
+coefficient, confidence interval, and p-value. `mcid_logistic` fits the corresponding
+logistic regression for MCID attainment, and `mcid_table` assembles the headline
+contrast of muscle *size* (volume) versus *quality* (texture) across the three muscles
+for both ODI and PROMIS-PF. `mmrm` fits a linear mixed model over all timepoints to use
+every patient with at least one follow-up under a missing-at-random assumption.
+`quality_direction` empirically resolves the sign of the intensity measure by correlating
+it with age and volume (older and atrophied muscles show more fat), confirming that
+higher texture denotes worse muscle quality.
 
 # Module 5 — `figures.py`
 
-`forest_plot` displays the per-standard-deviation associations of each muscle exposure
-with the change in physical function, alongside the leg-pain negative control, so that
-the dissociation is visible in a single panel. `trajectory_plot` shows physical-function
-recovery over time stratified by muscle quality, and `strobe_diagram` renders the
-patient-flow counts.
+The figures follow the JAMA convention of a table whose rows carry the estimate, 95%
+confidence interval, and p-value as text columns, aligned with a forest panel and a null
+reference line. `jama_forest` renders the continuous (ANCOVA) effects with a reference
+line at zero; `jama_forest_or` renders the MCID odds ratios on a log scale with a
+reference line at one and is the headline figure (muscle size versus quality).
+`trajectory_plot` shows physical-function recovery over time stratified by low versus
+high iliopsoas fatty infiltration.
+
+# Key result
+
+Across 385 imaged patients (mean age 62.8 years, 47% female), muscle **volume** was not
+associated with achieving MCID for any muscle (all p>0.40). Greater iliopsoas **fatty
+infiltration** was associated with **lower** odds of achieving MCID on the ODI
+(OR 0.60 per SD; 95% CI 0.40–0.91; p=0.015) and PROMIS Physical Function (OR 0.70;
+0.48–1.02; p=0.06), independent of volume, and specific to the iliopsoas. The
+interpretation—muscle *quality*, not *quantity*, gates clinically meaningful recovery
+after decompression—is reported as hypothesis-generating (see `ABSTRACT.md`).
 
 # Module 6 — `pipeline.py`
 

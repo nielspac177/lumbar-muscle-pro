@@ -36,6 +36,12 @@ def load_raw(cfg: dict) -> pd.DataFrame:
 
 
 def col(data: pd.DataFrame, substr: str) -> pd.Series | None:
-    """Fetch the first column whose flattened name contains `substr` (case-insensitive)."""
-    hits = [c for c in data.columns if substr.lower() in c.lower()]
-    return data[hits[0]] if hits else None
+    """Fetch the first column whose flattened name contains `substr` (case-insensitive).
+
+    Selects by position because header forward-fill can create duplicate labels
+    (e.g. a blank column adjacent to 'mrn' inherits the 'mrn' label).
+    """
+    for i, c in enumerate(data.columns):
+        if substr.lower() in c.lower():
+            return data.iloc[:, i]
+    return None
