@@ -17,3 +17,4 @@ WINSOR_LIMITS: [0.0, 0.01]          # cap top 1% volume outliers
 PRIMARY_OUTCOME: "PROMIS Physical Function"
 PRIMARY_TIMEPOINTS: ["6W Post", "1Y Post"]
 PROMIS_PF_MCID: 4.5                 # points; sensitivity-test 3.0–8.0 (see PLAN.md)
+GLOBAL_PH_MCID: 5.0    # ~half-SD T-score; sweep 3-5

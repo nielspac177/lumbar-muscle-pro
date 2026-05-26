@@ -54,7 +54,8 @@ def mcid_table(df: pd.DataFrame) -> pd.DataFrame:
     The headline contrast is muscle size (volume) versus muscle quality (texture).
     """
     rows = []
-    specs = [("ODI MCID (≥12.8)", "odi_mcid_1y", "odi_base"),
+    specs = [("Global PH MCID (≥5)", "ph_mcid_1y", "ph_base"),
+             ("ODI MCID (≥12.8)", "odi_mcid_1y", "odi_base"),
              ("PROMIS-PF MCID (≥4.5)", "pf_mcid_1y", "pf_base")]
     for model, flag, base in specs:
         for exp in MCID_EXPOSURES:

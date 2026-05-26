@@ -34,17 +34,17 @@ Function ≥4.5). Radicular leg pain was a prespecified negative control.
 Higher cord-normalized iliopsoas T2 predicted greater improvement in PROMIS Global
 Physical Health (PH) at 3 months (β=+1.11; 95% CI 0.54 to 1.69; p<0.001) and greater ODI reduction at
 3 months (β=−3.05; −5.19 to −0.90; p=0.005) and 1 year (β=−2.40; −4.48 to −0.32;
-p=0.023); the deep back muscle showed concordant 3-month effects (PH p=0.027; ODI
-p=0.050). Greater iliopsoas T2 heterogeneity predicted lower odds of ODI MCID (OR 0.60;
-0.40 to 0.91; p=0.015) and PROMIS-PF MCID (OR 0.70; 0.48 to 1.02; p=0.06), independent of
-volume. Volume and back/leg pain showed no associations.
+p=0.023); deep back showed concordant 3-month effects (PH p=0.027; ODI p=0.050). In an
+exploratory analysis, greater iliopsoas T2 heterogeneity was associated with lower odds
+of ODI MCID (OR 0.60; 0.40 to 0.91; p=0.015), but not for PROMIS-PF or Global Physical
+Health MCID. Volume and back/leg pain showed no associations.
 
 ### Conclusion
 Scanner-normalized paraspinal and iliopsoas T2 signal independently predicted early
 functional and disability improvement after lumbar decompression, including a durable
-1-year disability effect not evident in unadjusted raw-signal analyses, whereas greater
-T2 heterogeneity predicted lower odds of clinically meaningful improvement. Higher T2
-tracking better recovery suggests reversible edema or inflammation rather than chronic
+1-year disability effect not evident in unadjusted raw-signal analyses; an exploratory
+T2-heterogeneity association with ODI MCID did not replicate across instruments. Higher
+T2 tracking better recovery suggests reversible edema or inflammation rather than chronic
 fat; quantitative fat-water imaging is warranted.
 
 ---

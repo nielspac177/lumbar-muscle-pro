@@ -181,4 +181,7 @@ def make_tidy(data, cfg) -> pd.DataFrame:
     tidy.loc[tidy["pf_1y"].isna() | tidy["pf_base"].isna(), "pf_mcid_1y"] = np.nan
     tidy["odi_mcid_1y"] = ((tidy["odi_base"] - tidy["odi_1y"]) >= odi_mcid).astype("float")
     tidy.loc[tidy["odi_1y"].isna() | tidy["odi_base"].isna(), "odi_mcid_1y"] = np.nan
+    ph_mcid = float(cfg.get("GLOBAL_PH_MCID", 5.0))   # ~half-SD T-score improvement
+    tidy["ph_mcid_1y"] = ((tidy["ph_1y"] - tidy["ph_base"]) >= ph_mcid).astype("float")
+    tidy.loc[tidy["ph_1y"].isna() | tidy["ph_base"].isna(), "ph_mcid_1y"] = np.nan
     return tidy
