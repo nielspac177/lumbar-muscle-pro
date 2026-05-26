@@ -33,6 +33,9 @@ should obtain the dataset through the study's data-governance process.
 | Path | Contents |
 | --- | --- |
 | `PLAN.md` | Study and analysis plan: hypotheses, causal model, STROBE flow, statistics |
+| `docs/ABSTRACT.md` | CNS abstract draft (300 words, structured) |
+| `docs/Abstract_with_figures.docx` / `.pdf` | Submission package: abstract + embedded figures |
+| `docs/figures/` | Result figures (forest plots, responder gradient, trajectory, graphical abstract) |
 | `docs/LITERATURE_REVIEW.md` | Assessment of novelty relative to prior literature |
 | `docs/CODE_WALKTHROUGH.pdf` | Line-by-line explanation of the analysis code |
 | `docs/callgraph.*` | Function call graph of the analysis pipeline |

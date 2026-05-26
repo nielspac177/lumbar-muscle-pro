@@ -9,7 +9,8 @@ from .data_loading import load_config, load_raw
 from .cleaning import make_tidy
 from .cohort import flow_counts, completers_vs_noncompleters, analytic_cohort
 from .analysis import run_all, mcid_table, quality_direction
-from .figures import jama_forest, jama_forest_or, trajectory_plot
+from .figures import (jama_forest, jama_forest_or, trajectory_plot,
+                      mcid_by_tertile, graphical_abstract)
 
 
 def prepare(config_path: str = "config.yaml"):
@@ -39,8 +40,10 @@ def run(config_path: str = "config.yaml", outdir="results", figdir="figures"):
     qdir.to_csv(f"{outdir}/quality_direction.csv", index=False)
     completers_vs_noncompleters(tidy).to_csv(f"{outdir}/attrition.csv")
 
-    jama_forest_or(mcid, out=f"{figdir}/forest_mcid.png")          # headline figure
+    jama_forest_or(mcid, out=f"{figdir}/forest_mcid.png")          # headline forest
     jama_forest(results, out=f"{figdir}/forest_pf_legpain.png")    # continuous + neg control
+    mcid_by_tertile(tidy, out=f"{figdir}/mcid_by_tertile.png")     # responder gradient
+    graphical_abstract(tidy, out=f"{figdir}/graphical_abstract.png")
     trajectory_plot(tidy, out=f"{figdir}/trajectory.png", strat="z_iliopsoas_texture")
     return {"flow": flow, "results": results, "mcid": mcid, "quality_direction": qdir}
 
