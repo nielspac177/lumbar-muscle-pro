@@ -132,9 +132,9 @@ def delta_adjusted(df, exposure, outcome, tp):
 
 def t2_timecourse_table(df: pd.DataFrame) -> pd.DataFrame:
     """PRIMARY analysis: adjusted per-SD effect of cord-normalized T2 on change in
-    PROMIS Physical Health and ODI across postoperative timepoints."""
+    PROMIS Global Physical Health and ODI across postoperative timepoints."""
     rows = []
-    specs = [("Δ PROMIS Physical Health", "ph"),
+    specs = [("Δ PROMIS Global Physical Health", "ph"),
              ("Δ Oswestry Disability Index", "odi")]
     for model, out in specs:
         for exp, mlabel in RATIO_EXP.items():

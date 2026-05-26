@@ -31,8 +31,8 @@ attainment of a minimal clinically important difference (MCID; ODI ≥12.8, PROM
 Function ≥4.5). Radicular leg pain was a prespecified negative control.
 
 ### Results
-Higher cord-normalized iliopsoas T2 predicted greater improvement in PROMIS Physical
-Health at 3 months (β=+1.11; 95% CI 0.54 to 1.69; p<0.001) and greater ODI reduction at
+Higher cord-normalized iliopsoas T2 predicted greater improvement in PROMIS Global
+Physical Health (PH) at 3 months (β=+1.11; 95% CI 0.54 to 1.69; p<0.001) and greater ODI reduction at
 3 months (β=−3.05; −5.19 to −0.90; p=0.005) and 1 year (β=−2.40; −4.48 to −0.32;
 p=0.023); the deep back muscle showed concordant 3-month effects (PH p=0.027; ODI
 p=0.050). Greater iliopsoas T2 heterogeneity predicted lower odds of ODI MCID (OR 0.60;
