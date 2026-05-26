@@ -178,7 +178,7 @@ negative-control dissociation**; (d) a **spine-normalized** index.
 ## 9. Deliverables & sequence
 1. ✅ Literature/novelty review
 2. ✅ This plan + repo scaffold + mermaid diagrams
-3. ⬜ Scientific schematic (study-design figure, Nano Banana) — *pending approval*
+3. ✅ Study-design schematic (`docs/study_design_schematic.*`) + call graph + code walkthrough
 4. ⬜ Implement `src/` modules
 5. ⬜ Run analysis → Table 1, models, figures
 6. ⬜ Draft 300-word CNS abstract (Intro / Objective / Methods / Results / Conclusion)
