@@ -48,9 +48,13 @@ T2 tracking better recovery suggests reversible edema or inflammation rather tha
 fat; quantitative fat-water imaging is warranted.
 
 ---
-*Body word count ≈ 300. Internal notes (not for submission): primary signal is strongest
+*Body word count = 300. Internal notes (not for submission): primary signal is strongest
 at 3 months (PH p<0.001; ODI p=0.005) and survives covariate adjustment and scanner
 normalization; the 1-year ODI effect (p=0.023) extends the prior unadjusted analysis. The
 heterogeneity→MCID result is a distinct T2 facet (dispersion vs level) and is
-hypothesis-generating given multiple metrics tested. T2 remains a proxy pending
-quantitative fat-fraction imaging.*
+hypothesis-generating given multiple metrics tested. **Sensitivity:** the exploratory
+heterogeneity association was significant for ODI MCID only; it did not replicate on
+PROMIS-PF MCID (OR 0.70; p=0.06) or on Global Physical Health MCID, and the Global-PH MCID
+null was stable across improvement thresholds of 3–5 T-score points (OR 0.92–1.06; all
+p>0.6; see results/ph_mcid_threshold_sweep.csv). T2 remains a proxy pending quantitative
+fat-fraction imaging.*

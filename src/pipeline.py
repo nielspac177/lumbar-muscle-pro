@@ -8,7 +8,8 @@ import os
 from .data_loading import load_config, load_raw
 from .cleaning import make_tidy
 from .cohort import flow_counts, completers_vs_noncompleters, analytic_cohort
-from .analysis import run_all, mcid_table, quality_direction, t2_timecourse_table
+from .analysis import (run_all, mcid_table, quality_direction, t2_timecourse_table,
+                       ph_mcid_threshold_sweep)
 from .figures import (jama_forest, jama_forest_or, trajectory_plot,
                       mcid_by_tertile, graphical_abstract)
 
@@ -35,7 +36,9 @@ def run(config_path: str = "config.yaml", outdir="results", figdir="figures"):
     t2tc = t2_timecourse_table(seg)        # PRIMARY: cord-normalized T2 -> recovery over time
     results = run_all(seg)                 # continuous ANCOVA (PF + leg-pain control)
     mcid = mcid_table(seg)                 # SECONDARY: size vs quality -> MCID odds
+    ph_sweep = ph_mcid_threshold_sweep(seg)  # sensitivity: Global-PH MCID threshold
 
+    ph_sweep.to_csv(f"{outdir}/ph_mcid_threshold_sweep.csv", index=False)
     t2tc.to_csv(f"{outdir}/t2_timecourse_results.csv", index=False)
     results.to_csv(f"{outdir}/forest_results.csv", index=False)
     mcid.to_csv(f"{outdir}/mcid_results.csv", index=False)

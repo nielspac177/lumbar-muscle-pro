@@ -48,6 +48,21 @@ MCID_EXPOSURES = [
 ]
 
 
+def ph_mcid_threshold_sweep(df, exposure="z_iliopsoas_texture", thresholds=(3, 4, 5)):
+    """Sensitivity: iliopsoas heterogeneity -> Global Physical Health MCID across
+    improvement thresholds, confirming the null is threshold-independent."""
+    rows = []
+    for thr in thresholds:
+        flag = ((df["ph_1y"] - df["ph_base"]) >= thr).astype(float)
+        flag[df["ph_1y"].isna() | df["ph_base"].isna()] = np.nan
+        d = df.assign(_phm=flag)
+        r = mcid_logistic(d, exposure, flag="_phm", covars=("age", "C(sex)", "ph_base"))
+        r["threshold"] = thr
+        r["responder_rate"] = float(flag.mean())
+        rows.append(r)
+    return pd.DataFrame(rows)
+
+
 def mcid_table(df: pd.DataFrame) -> pd.DataFrame:
     """Odds ratios for achieving MCID on ODI and PROMIS-PF at 1 year, per exposure.
 

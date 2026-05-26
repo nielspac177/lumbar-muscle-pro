@@ -100,7 +100,7 @@ const doc = new Document({
 
       new Paragraph({ spacing: { before: 240 },
         children: [new TextRun({ size: 16, italics: true, color: "777777",
-          text: "Conventional T2 signal is a proxy pending validation against quantitative fat-water imaging; the heterogeneity result is hypothesis-generating. Generated from the analysis pipeline in this repository (code only; no patient data)." })] }),
+          text: "Sensitivity: the exploratory iliopsoas heterogeneity association was significant for ODI MCID only and did not replicate on PROMIS Physical Function MCID (OR 0.70; p=0.06) or Global Physical Health MCID, with the Global-PH MCID null stable across thresholds of 3–5 T-score points (OR 0.92–1.06; all p>0.6). Conventional T2 is a proxy pending validation against quantitative fat-water imaging. Generated from the analysis pipeline in this repository (code only; no patient data)." })] }),
     ],
   }],
 });
