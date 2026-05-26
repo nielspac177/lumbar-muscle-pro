@@ -1,57 +1,56 @@
 # CNS Abstract — draft
 
-**Title:** Iliopsoas Fatty Infiltration, Not Muscle Volume, Predicts Failure to Achieve
-a Minimal Clinically Important Difference After Lumbar Decompression
+**Title:** Scanner-Normalized Paraspinal and Iliopsoas Muscle T2 Signal Predicts Functional
+Recovery After Lumbar Decompression: A Covariate-Adjusted Analysis
 
 **Track:** Spine
 
-**Authors:** Jimena Gonzales; [co-authors]; Niels Pacheco-Barrios
-*(finalize order and affiliations)*
+**Authors:** Jimena Gonzalez-Salido; Niels Pacheco-Barrios; [co-authors]; Ziev B. Moses;
+Martina Stippler *(finalize order and affiliations)*
 
 ---
 
 ### Introduction
-Paraspinal muscle status has been associated with outcomes after spine surgery, but most
-evidence comes from fusion cohorts or single-slice cross-sectional area, and its
-prognostic value after decompression is unclear, particularly whether muscle quantity or
-quality matters.
+Paraspinal and iliopsoas muscle quality on MRI may predict recovery after lumbar
+decompression, but prior analyses used raw, scanner-dependent T2 intensity and unadjusted
+correlations, conflating muscle biology with acquisition.
 
 ### Objective
-To determine whether preoperative volumetric size or fatty infiltration of the iliopsoas
-and paraspinal muscles predicts achievement of a minimal clinically important difference
-(MCID) one year after lumbar decompression.
+To test whether scanner-normalized T2 signal and T2 heterogeneity of the paraspinal and
+iliopsoas muscles predict functional recovery after lumbar decompression.
 
 ### Methods
-In a retrospective cohort undergoing lumbar decompression, preoperative MRI underwent
-volumetric segmentation of the iliopsoas, deep back, and gluteus medius muscles (n=385;
-mean age 62.8±13.3 years; 47% female). For each muscle we computed bilateral volume
-(normalized to vertebral-body volume) and fatty infiltration, indexed by intramuscular
-signal heterogeneity (coefficient of variation and normalized interpercentile spread);
-all exposures were standardized. Multivariable logistic regression modeled MCID
-attainment on the Oswestry Disability Index (≥12.8) and PROMIS Physical Function (≥4.5)
-at one year, adjusting for age, sex, and baseline score, yielding odds ratios per
-standard deviation. Radicular leg pain served as a prespecified negative control.
+In a retrospective cohort (n=385; mean age 62.8±13.4 years; 47% female), preoperative
+T2-weighted MRI underwent 3D segmentation of the iliopsoas and deep back muscles. Mean
+muscle T2 was normalized to spinal-cord signal (scanner-robust), and intramuscular
+heterogeneity indexed by the coefficient of variation; exposures were standardized.
+Multivariable regression modeled
+change in PROMIS Global Physical Health and Oswestry Disability Index (ODI) from 6 weeks
+to 1 year, adjusting for age, sex, and baseline (per 1 SD). Logistic regression modeled
+attainment of a minimal clinically important difference (MCID; ODI ≥12.8, PROMIS Physical
+Function ≥4.5). Radicular leg pain was a prespecified negative control.
 
 ### Results
-161 and 169 patients had one-year ODI and PROMIS-PF; 61% and 67% achieved MCID (mean ODI
-48.6→27.4; PROMIS-PF 33.7→41.6). Muscle volume was not associated with MCID for any
-muscle (all p>0.40). Greater iliopsoas fatty infiltration was associated with lower odds
-of achieving ODI MCID (OR 0.60 per SD; 95% CI 0.40–0.91; p=0.015) and PROMIS-PF MCID
-(OR 0.70; 0.48–1.02; p=0.06), independent of volume (OR 0.66; p=0.033). Associations were
-specific to the iliopsoas; the deep back, gluteus medius, and the leg-pain negative
-control were null.
+Higher cord-normalized iliopsoas T2 predicted greater improvement in PROMIS Physical
+Health at 3 months (β=+1.11; 95% CI 0.54 to 1.69; p<0.001) and greater ODI reduction at
+3 months (β=−3.05; −5.19 to −0.90; p=0.005) and 1 year (β=−2.40; −4.48 to −0.32;
+p=0.023); the deep back muscle showed concordant 3-month effects (PH p=0.027; ODI
+p=0.050). Greater iliopsoas T2 heterogeneity predicted lower odds of ODI MCID (OR 0.60;
+0.40 to 0.91; p=0.015) and PROMIS-PF MCID (OR 0.70; 0.48 to 1.02; p=0.06), independent of
+volume. Volume and back/leg pain showed no associations.
 
 ### Conclusion
-After lumbar decompression, muscle quality (iliopsoas fatty infiltration), rather than
-muscle volume, predicted failure to achieve clinically meaningful improvement in
-disability and physical function. The iliopsoas may inform preoperative risk
-stratification and prehabilitation. These exploratory findings should be confirmed with
-quantitative fat-fraction imaging.
+Scanner-normalized paraspinal and iliopsoas T2 signal independently predicted early
+functional and disability improvement after lumbar decompression, including a durable
+1-year disability effect not evident in unadjusted raw-signal analyses, whereas greater
+T2 heterogeneity predicted lower odds of clinically meaningful improvement. Higher T2
+tracking better recovery suggests reversible edema or inflammation rather than chronic
+fat; quantitative fat-water imaging is warranted.
 
 ---
-*Body word count ≈ 300 (Introduction–Conclusion). Honesty notes for internal use, not
-for submission: the PROMIS-PF association is borderline (p=0.06); the texture metric is
-an imaging proxy, not a validated fat fraction; the iliopsoas finding emerged among
-several muscle-quality metrics tested and should be treated as hypothesis-generating
-pending replication with a quantitative fat measure and the imaging team's validated
-multifidus segmentation.*
+*Body word count ≈ 300. Internal notes (not for submission): primary signal is strongest
+at 3 months (PH p<0.001; ODI p=0.005) and survives covariate adjustment and scanner
+normalization; the 1-year ODI effect (p=0.023) extends the prior unadjusted analysis. The
+heterogeneity→MCID result is a distinct T2 facet (dispersion vs level) and is
+hypothesis-generating given multiple metrics tested. T2 remains a proxy pending
+quantitative fat-fraction imaging.*

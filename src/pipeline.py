@@ -8,7 +8,7 @@ import os
 from .data_loading import load_config, load_raw
 from .cleaning import make_tidy
 from .cohort import flow_counts, completers_vs_noncompleters, analytic_cohort
-from .analysis import run_all, mcid_table, quality_direction
+from .analysis import run_all, mcid_table, quality_direction, t2_timecourse_table
 from .figures import (jama_forest, jama_forest_or, trajectory_plot,
                       mcid_by_tertile, graphical_abstract)
 
@@ -32,20 +32,28 @@ def run(config_path: str = "config.yaml", outdir="results", figdir="figures"):
     seg = tidy[tidy["iliopsoas_vol"].notna()].copy()
 
     qdir = quality_direction(seg)
+    t2tc = t2_timecourse_table(seg)        # PRIMARY: cord-normalized T2 -> recovery over time
     results = run_all(seg)                 # continuous ANCOVA (PF + leg-pain control)
-    mcid = mcid_table(seg)                # primary: size vs quality -> MCID odds
+    mcid = mcid_table(seg)                 # SECONDARY: size vs quality -> MCID odds
 
+    t2tc.to_csv(f"{outdir}/t2_timecourse_results.csv", index=False)
     results.to_csv(f"{outdir}/forest_results.csv", index=False)
     mcid.to_csv(f"{outdir}/mcid_results.csv", index=False)
     qdir.to_csv(f"{outdir}/quality_direction.csv", index=False)
     completers_vs_noncompleters(tidy).to_csv(f"{outdir}/attrition.csv")
 
-    jama_forest_or(mcid, out=f"{figdir}/forest_mcid.png")          # headline forest
-    jama_forest(results, out=f"{figdir}/forest_pf_legpain.png")    # continuous + neg control
-    mcid_by_tertile(tidy, out=f"{figdir}/mcid_by_tertile.png")     # responder gradient
+    # PRIMARY figure: cord-normalized T2 signal vs change in PH and ODI over time
+    jama_forest(t2tc, out=f"{figdir}/forest_t2_timecourse.png",
+                title="Cord-normalized paraspinal T2 signal and postoperative recovery",
+                xlabel="← worse change      |      better change →   (ΔPH ↑ better; ΔODI ↓ better)",
+                col_header="Muscle (per 1 SD higher T2)")
+    jama_forest_or(mcid, out=f"{figdir}/forest_mcid.png")          # secondary
+    jama_forest(results, out=f"{figdir}/forest_pf_legpain.png")    # neg control
+    mcid_by_tertile(tidy, out=f"{figdir}/mcid_by_tertile.png")
     graphical_abstract(tidy, out=f"{figdir}/graphical_abstract.png")
     trajectory_plot(tidy, out=f"{figdir}/trajectory.png", strat="z_iliopsoas_texture")
-    return {"flow": flow, "results": results, "mcid": mcid, "quality_direction": qdir}
+    return {"flow": flow, "t2_timecourse": t2tc, "results": results,
+            "mcid": mcid, "quality_direction": qdir}
 
 
 if __name__ == "__main__":

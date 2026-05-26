@@ -18,7 +18,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from .data_loading import col
+from .data_loading import col, col_exact
 
 MUSCLES = {
     "iliopsoas": ("left iliopsoas muscle", "right iliopsoas muscle"),
@@ -157,6 +157,11 @@ def build_outcomes(data) -> pd.DataFrame:
                 if series is not None:
                     break
             out[f"{key}_{short}"] = series
+    # PROMIS Global-10 Physical Health (the group's primary instrument). Exact match
+    # to avoid colliding with '..._raw_score' / '..._se' columns.
+    for short, tp in _TPS.items():
+        out[f"ph_{short}"] = _num(col_exact(
+            data, f"PROMIS Global 10 {tp} global_physical_health"))
     return out
 
 

@@ -112,6 +112,43 @@ def run_all(cohort: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+# Primary (scanner-robust) exposures: T2 normalized to spinal-cord signal.
+RATIO_EXP = {"z_iliopsoas_rcord": "Iliopsoas", "z_deep_back_rcord": "Deep back"}
+
+
+def delta_adjusted(df, exposure, outcome, tp):
+    """Adjusted regression of change in `outcome` (followup tp - baseline) on a
+    standardised exposure + age + sex + baseline value, HC3 robust SE.
+    Returns per-SD beta, 95% CI, p, n. (Improvement: PH increases, ODI decreases.)"""
+    fu, base = f"{outcome}_{tp}", f"{outcome}_base"
+    d = df.dropna(subset=[fu, base, exposure, "age", "sex"]).copy()
+    d["_delta"] = d[fu] - d[base]
+    mm = smf.ols(f"_delta ~ {exposure} + age + C(sex) + {base}", d).fit(cov_type="HC3")
+    ci = mm.conf_int().loc[exposure]
+    return {"exposure": exposure, "outcome": outcome, "tp": tp, "n": int(mm.nobs),
+            "beta": float(mm.params[exposure]), "ci_low": float(ci[0]),
+            "ci_high": float(ci[1]), "p": float(mm.pvalues[exposure])}
+
+
+def t2_timecourse_table(df: pd.DataFrame) -> pd.DataFrame:
+    """PRIMARY analysis: adjusted per-SD effect of cord-normalized T2 on change in
+    PROMIS Physical Health and ODI across postoperative timepoints."""
+    rows = []
+    specs = [("Δ PROMIS Physical Health", "ph"),
+             ("Δ Oswestry Disability Index", "odi")]
+    for model, out in specs:
+        for exp, mlabel in RATIO_EXP.items():
+            for tp in ["6w", "3m", "6m", "1y"]:
+                try:
+                    r = delta_adjusted(df, exp, out, tp)
+                    r["model"] = model
+                    r["label"] = f"{mlabel} — {tp.upper()}"
+                    rows.append(r)
+                except Exception:
+                    pass
+    return pd.DataFrame(rows)
+
+
 def quality_direction(cohort: pd.DataFrame) -> pd.DataFrame:
     """Empirically resolve the sign of 'quality': correlate each muscle's raw
     intensity with age and with volume (older / atrophied -> more fat)."""

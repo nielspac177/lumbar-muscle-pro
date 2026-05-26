@@ -45,3 +45,15 @@ def col(data: pd.DataFrame, substr: str) -> pd.Series | None:
         if substr.lower() in c.lower():
             return data.iloc[:, i]
     return None
+
+
+def col_exact(data: pd.DataFrame, name: str) -> pd.Series | None:
+    """Fetch the column whose flattened name equals `name` exactly (case-insensitive).
+
+    Needed when a substring would collide with longer names (e.g.
+    'global_physical_health' vs 'global_physical_health_raw_score').
+    """
+    for i, c in enumerate(data.columns):
+        if c.strip().lower() == name.strip().lower():
+            return data.iloc[:, i]
+    return None

@@ -97,10 +97,13 @@ def _fmt_p(p):
     return "<.001" if p < 0.001 else f"{p:.3f}".lstrip("0")
 
 
-def jama_forest(results: pd.DataFrame, out="figures/forest_pf_legpain.png"):
+def jama_forest(results: pd.DataFrame, out="figures/forest_pf_legpain.png",
+                title="Muscle morphology and 1-year outcomes after lumbar decompression",
+                xlabel="Worse ←   favours lower muscle      |      favours higher muscle   → better",
+                col_header="Muscle exposure (per 1 SD)"):
     """Render a JAMA-style table + forest figure grouped by model.
 
-    `results` columns: model, exposure, beta, ci_low, ci_high, p, n.
+    `results` columns: model, exposure, beta, ci_low, ci_high, p, n (optional: label).
     """
     groups = list(dict.fromkeys(results["model"]))      # preserve order
     # Build the row layout: a header line per group, then its exposures.
@@ -125,7 +128,7 @@ def jama_forest(results: pd.DataFrame, out="figures/forest_pf_legpain.png"):
 
     X_LABEL, X_CI, X_P = 0.00, 0.56, 1.06
     # Column headers
-    axt.text(X_LABEL, n + 0.9, "Muscle exposure (per 1 SD)", fontsize=10.5, fontweight="bold")
+    axt.text(X_LABEL, n + 0.9, col_header, fontsize=10.5, fontweight="bold")
     axt.text(X_CI, n + 0.9, "β (95% CI)", fontsize=10.5, fontweight="bold", ha="left")
     axt.text(X_P, n + 0.9, "P value", fontsize=10.5, fontweight="bold", ha="left")
 
@@ -139,7 +142,7 @@ def jama_forest(results: pd.DataFrame, out="figures/forest_pf_legpain.png"):
             axt.text(-0.02, y, payload, fontsize=10, fontweight="bold", style="italic")
             continue
         r = payload
-        label = LABELS.get(r["exposure"], r["exposure"])
+        label = r["label"] if "label" in r and pd.notna(r.get("label")) else LABELS.get(r["exposure"], r["exposure"])
         sig = r["p"] < 0.05
         axt.text(0.03, y, label, fontsize=9.5)
         axt.text(X_CI, y, f"{r['beta']:.2f} ({r['ci_low']:.2f} to {r['ci_high']:.2f})",
@@ -156,11 +159,9 @@ def jama_forest(results: pd.DataFrame, out="figures/forest_pf_legpain.png"):
         axp.spines[s].set_visible(False)
     axp.set_yticks([])
     axp.tick_params(axis="x", labelsize=8.5)
-    axp.set_xlabel("Worse ←   favours lower muscle      |      favours higher muscle   → better",
-                   fontsize=8, color=GREY)
+    axp.set_xlabel(xlabel, fontsize=8, color=GREY)
 
-    fig.suptitle("Muscle morphology and 1-year outcomes after lumbar decompression",
-                 fontsize=12.5, fontweight="bold", y=0.99)
+    fig.suptitle(title, fontsize=12.5, fontweight="bold", y=0.99)
     os.makedirs(os.path.dirname(out), exist_ok=True)
     fig.savefig(out, dpi=300, bbox_inches="tight")
     fig.savefig(out.replace(".png", ".svg"), bbox_inches="tight")
